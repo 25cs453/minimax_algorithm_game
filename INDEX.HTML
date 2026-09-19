@@ -1,0 +1,2867 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>HOLO AI ARENA</title>
+
+<style>
+
+:root{
+    --bg:#030712;
+    --panel:#071426;
+    --cyan:#00f5ff;
+    --purple:#a855f7;
+    --pink:#ff3df2;
+    --green:#32ff9a;
+    --red:#ff477e;
+    --text:#eafcff;
+    --muted:#7890aa;
+    --line:#17314c;
+}
+
+*{
+    box-sizing:border-box;
+}
+
+body{
+    margin:0;
+    background:
+        radial-gradient(circle at 15% 10%,#073047,transparent 30%),
+        radial-gradient(circle at 90% 20%,#321050,transparent 30%),
+        var(--bg);
+    color:var(--text);
+    font-family:Segoe UI,Arial,sans-serif;
+    overflow-x:hidden;
+}
+
+/* SCANLINE EFFECT */
+
+body::before{
+    content:"";
+    position:fixed;
+    inset:0;
+    pointer-events:none;
+    background:
+        linear-gradient(
+            rgba(0,245,255,.025) 1px,
+            transparent 1px
+        );
+    background-size:100% 4px;
+    opacity:.35;
+    z-index:100;
+}
+
+/* LAYOUT */
+
+.app{
+    display:grid;
+    grid-template-columns:245px 1fr;
+    min-height:100vh;
+}
+
+.sidebar{
+    padding:25px 16px;
+    border-right:1px solid #16405c;
+    background:#030b16ee;
+    backdrop-filter:blur(18px);
+    position:sticky;
+    top:0;
+    height:100vh;
+}
+
+.logo{
+    display:flex;
+    gap:10px;
+    align-items:center;
+    font-weight:900;
+    margin:5px 8px 35px;
+}
+
+.logoIcon{
+    width:45px;
+    height:45px;
+    border:1px solid var(--cyan);
+    border-radius:13px;
+    display:grid;
+    place-items:center;
+    color:var(--cyan);
+    box-shadow:0 0 25px #00f5ff66;
+    text-shadow:0 0 12px var(--cyan);
+}
+
+.logo small{
+    display:block;
+    color:var(--muted);
+    font-weight:500;
+}
+
+.nav label{
+    display:block;
+    color:#3f5c74;
+    font-size:10px;
+    letter-spacing:2px;
+    margin:25px 10px 8px;
+}
+
+.nav button{
+    display:block;
+    width:100%;
+    margin:5px 0;
+    padding:13px;
+    border:1px solid transparent;
+    border-radius:11px;
+    background:transparent;
+    color:#7e95ad;
+    text-align:left;
+    cursor:pointer;
+}
+
+.nav button:hover,
+.nav button.active{
+    color:white;
+    border-color:#00f5ff44;
+    background:linear-gradient(
+        90deg,
+        #00f5ff12,
+        #a855f712
+    );
+    box-shadow:inset 3px 0 var(--cyan);
+}
+
+main{
+    padding:28px;
+    max-width:1450px;
+    width:100%;
+    margin:auto;
+}
+
+.top{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:20px;
+}
+
+.live{
+    color:var(--green);
+    font-size:11px;
+    border:1px solid #32ff9a55;
+    padding:7px 10px;
+    border-radius:99px;
+    box-shadow:0 0 18px #32ff9a18;
+}
+
+.page{
+    display:none;
+}
+
+.page.active{
+    display:block;
+}
+
+/* HERO */
+
+.hero{
+    position:relative;
+    overflow:hidden;
+    padding:38px;
+    border:1px solid #1a4964;
+    border-radius:25px;
+    background:
+        linear-gradient(
+            135deg,
+            #071827ee,
+            #0d1025ee
+        );
+    box-shadow:0 20px 70px #0008;
+}
+
+.hero h1{
+    font-size:clamp(32px,5vw,60px);
+    line-height:.98;
+    letter-spacing:-3px;
+    margin:12px 0;
+}
+
+.grad{
+    background:
+        linear-gradient(
+            90deg,
+            var(--cyan),
+            white,
+            var(--purple)
+        );
+    -webkit-background-clip:text;
+    color:transparent;
+}
+
+.hero p{
+    max-width:760px;
+    color:#8fa5bc;
+    line-height:1.7;
+}
+
+/* CARDS */
+
+.grid{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:15px;
+    margin-top:15px;
+}
+
+.card{
+    background:
+        linear-gradient(
+            145deg,
+            #071629e8,
+            #07101ee8
+        );
+    border:1px solid var(--line);
+    border-radius:18px;
+    padding:20px;
+    box-shadow:0 10px 35px #0005;
+}
+
+.muted{
+    color:var(--muted);
+    font-size:12px;
+}
+
+.stat{
+    font-size:29px;
+    font-weight:900;
+    margin:8px 0;
+}
+
+.head{
+    display:flex;
+    justify-content:space-between;
+    gap:15px;
+    align-items:center;
+    margin:22px 0 14px;
+}
+
+.head h2{
+    margin:0;
+}
+
+.head p{
+    color:var(--muted);
+    margin:6px 0;
+}
+
+.controls{
+    display:flex;
+    gap:8px;
+    flex-wrap:wrap;
+}
+
+.btn{
+    border:1px solid #23445c;
+    background:#091b2e;
+    color:#dffcff;
+    padding:10px 14px;
+    border-radius:10px;
+    cursor:pointer;
+}
+
+.btn:hover{
+    border-color:var(--cyan);
+    box-shadow:0 0 18px #00f5ff22;
+}
+
+.primary{
+    border:0;
+    background:
+        linear-gradient(
+            90deg,
+            var(--cyan),
+            var(--purple)
+        );
+    color:#00121a;
+    font-weight:900;
+}
+
+/* =========================
+   HOLOGRAM
+========================= */
+
+.holoStage{
+    height:430px;
+    position:relative;
+    display:grid;
+    place-items:center;
+    overflow:hidden;
+    border-radius:22px;
+    border:1px solid #00f5ff44;
+    background:
+        radial-gradient(
+            ellipse at center,
+            #062a3b55,
+            transparent 55%
+        ),
+        #020916;
+}
+
+.holoStage::before{
+    content:"";
+    position:absolute;
+    width:360px;
+    height:360px;
+    border-radius:50%;
+    border:1px solid #00f5ff55;
+    box-shadow:
+        0 0 40px #00f5ff22,
+        inset 0 0 40px #00f5ff12;
+    animation:spin 14s linear infinite;
+}
+
+.holoStage::after{
+    content:"";
+    position:absolute;
+    width:460px;
+    height:120px;
+    border:2px solid #00f5ff55;
+    border-radius:50%;
+    box-shadow:0 0 25px #00f5ff33;
+    animation:pulse 2.5s ease-in-out infinite;
+}
+
+.holo{
+    position:relative;
+    z-index:2;
+    width:205px;
+    height:205px;
+    display:grid;
+    place-items:center;
+    color:var(--cyan);
+    font-size:45px;
+    font-weight:900;
+    text-align:center;
+    text-shadow:
+        0 0 8px var(--cyan),
+        0 0 35px var(--cyan);
+    filter:drop-shadow(0 0 18px #00f5ff);
+    animation:float 3s ease-in-out infinite;
+}
+
+.ring{
+    position:absolute;
+    inset:18px;
+    border:1px solid #00f5ff88;
+    border-radius:50%;
+    animation:spin 5s linear infinite;
+}
+
+.ring2{
+    position:absolute;
+    inset:42px;
+    border:1px dashed #a855f788;
+    border-radius:50%;
+    animation:spin 7s linear reverse infinite;
+}
+
+.scan{
+    position:absolute;
+    z-index:3;
+    width:210px;
+    height:2px;
+    background:var(--cyan);
+    box-shadow:0 0 18px var(--cyan);
+    animation:scan 2.4s linear infinite;
+}
+
+.holoText{
+    position:absolute;
+    bottom:18px;
+    color:#4e9bb0;
+    font:11px monospace;
+    letter-spacing:3px;
+}
+
+@keyframes spin{
+    to{
+        transform:rotate(360deg);
+    }
+}
+
+@keyframes float{
+    50%{
+        transform:translateY(-12px);
+    }
+}
+
+@keyframes scan{
+    0%{
+        transform:translateY(-100px);
+        opacity:0;
+    }
+
+    20%,80%{
+        opacity:1;
+    }
+
+    100%{
+        transform:translateY(100px);
+        opacity:0;
+    }
+}
+
+@keyframes pulse{
+    50%{
+        transform:scale(1.12);
+        opacity:.35;
+    }
+}
+
+/* =========================
+   MINIMAX
+========================= */
+
+.treebox{
+    overflow:auto;
+    padding:25px;
+    background:#020a14;
+    border:1px solid var(--line);
+    border-radius:18px;
+}
+
+.tree{
+    min-width:1000px;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:22px;
+}
+
+.row{
+    display:flex;
+    gap:28px;
+    justify-content:center;
+}
+
+.node{
+    min-width:62px;
+    height:45px;
+    padding:5px 9px;
+    border:1px solid #34536d;
+    border-radius:10px;
+    background:#081a2b;
+    display:grid;
+    place-items:center;
+    font-weight:800;
+    transition:.2s;
+}
+
+.node.max{
+    border-color:#00f5ff77;
+}
+
+.node.min{
+    border-color:#a855f777;
+}
+
+.node.sel{
+    background:#06404c;
+    box-shadow:0 0 25px #00f5ff66;
+    border-color:var(--cyan);
+    transform:scale(1.08);
+}
+
+.node.prune{
+    opacity:.22;
+    filter:grayscale(1);
+    text-decoration:line-through;
+}
+
+.children{
+    display:flex;
+    gap:18px;
+}
+
+.sub{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:10px;
+}
+
+.leaves{
+    display:flex;
+    gap:5px;
+}
+
+.leaf{
+    font-size:11px;
+    min-width:48px;
+    height:39px;
+}
+
+/* =========================
+   A STAR
+========================= */
+
+.two{
+    display:grid;
+    grid-template-columns:1.4fr .6fr;
+    gap:15px;
+}
+
+.map{
+    overflow:auto;
+    background:#020914;
+    border:1px solid var(--line);
+    border-radius:18px;
+}
+
+.map svg{
+    width:100%;
+    min-width:820px;
+    height:550px;
+}
+
+.edge{
+    stroke:#1e3c55;
+    stroke-width:3;
+}
+
+.edge.on{
+    stroke:var(--cyan);
+    stroke-width:5;
+    filter:drop-shadow(0 0 5px #00f5ff);
+}
+
+.city{
+    fill:#081b2d;
+    stroke:#43627c;
+    stroke-width:2;
+}
+
+.city.on{
+    fill:#06404c;
+    stroke:var(--cyan);
+}
+
+.city.goal{
+    stroke:#ffb454;
+    fill:#3b2911;
+}
+
+.ct{
+    fill:#dffcff;
+    font-size:12px;
+    text-anchor:middle;
+    dominant-baseline:middle;
+    font-weight:800;
+}
+
+.ch{
+    fill:#557188;
+    font-size:10px;
+    text-anchor:middle;
+}
+
+.queue{
+    display:flex;
+    flex-wrap:wrap;
+    gap:6px;
+    margin-top:8px;
+}
+
+.q{
+    border:1px solid #23445c;
+    background:#0a1a2c;
+    padding:7px 9px;
+    border-radius:8px;
+    font-size:11px;
+}
+
+.formula{
+    font:14px monospace;
+    color:var(--cyan);
+    background:#020b15;
+    padding:13px;
+    border-radius:10px;
+    margin:12px 0;
+}
+
+.log{
+    background:#02070e;
+    border:1px solid #10273b;
+    border-radius:12px;
+    padding:12px;
+    white-space:pre-line;
+    font:12px monospace;
+    color:#88b2c7;
+    line-height:1.7;
+    min-height:100px;
+    max-height:190px;
+    overflow:auto;
+}
+
+/* =========================
+   TIC TAC TOE
+========================= */
+
+.gameLayout{
+    display:grid;
+    grid-template-columns:330px 1fr;
+    gap:15px;
+}
+
+.board{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:9px;
+    margin-top:10px;
+}
+
+.cell{
+    aspect-ratio:1;
+    border:1px solid #24506b;
+    background:#061527;
+    color:var(--cyan);
+    font-size:46px;
+    font-weight:900;
+    border-radius:14px;
+    cursor:pointer;
+}
+
+.cell:hover{
+    border-color:var(--cyan);
+    box-shadow:0 0 20px #00f5ff22;
+}
+
+.cell.o{
+    color:var(--purple);
+    text-shadow:0 0 15px var(--purple);
+}
+
+.cell.x{
+    color:var(--cyan);
+    text-shadow:0 0 15px var(--cyan);
+}
+
+.score{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:8px;
+}
+
+.score .card{
+    padding:12px;
+    text-align:center;
+}
+
+.mini{
+    font-size:22px;
+    font-weight:900;
+}
+
+.status{
+    padding:12px;
+    border:1px solid #17314c;
+    border-radius:10px;
+    background:#03101d;
+    color:#9dc2d2;
+    margin-top:10px;
+}
+
+/* QUIZ */
+
+.quiz{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:15px;
+}
+
+.option{
+    display:block;
+    width:100%;
+    text-align:left;
+    padding:11px;
+    margin:6px 0;
+    background:#07182a;
+    border:1px solid var(--line);
+    border-radius:9px;
+    color:white;
+    cursor:pointer;
+}
+
+.correct{
+    border-color:var(--green)!important;
+    color:var(--green);
+}
+
+.wrong{
+    border-color:var(--red)!important;
+    color:var(--red);
+}
+
+/* RESPONSIVE */
+
+@media(max-width:900px){
+
+    .app{
+        grid-template-columns:1fr;
+    }
+
+    .sidebar{
+        position:relative;
+        height:auto;
+        border-right:0;
+        border-bottom:1px solid #16405c;
+    }
+
+    .nav{
+        display:flex;
+        overflow:auto;
+    }
+
+    .nav label{
+        display:none;
+    }
+
+    main{
+        padding:16px;
+    }
+
+    .grid,
+    .two,
+    .gameLayout,
+    .quiz{
+        grid-template-columns:1fr;
+    }
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="app">
+
+<!-- SIDEBAR -->
+
+<aside class="sidebar">
+
+<div class="logo">
+
+<div class="logoIcon">
+AI
+</div>
+
+<div>
+HOLO AI
+<small>Algorithm Arena</small>
+</div>
+
+</div>
+
+<div class="nav">
+
+<label>LAB</label>
+
+<button class="active" data-page="home">
+⌂ Hologram Hub
+</button>
+
+<button data-page="minimax">
+♟ Minimax Lab
+</button>
+
+<button data-page="astar">
+✦ A* Navigator
+</button>
+
+<label>GAMES</label>
+
+<button data-page="tictactoe">
+◈ AI Tic-Tac-Toe
+</button>
+
+<button data-page="quiz">
+? Mission Quiz
+</button>
+
+</div>
+
+</aside>
+
+
+<!-- MAIN -->
+
+<main>
+
+<div class="top">
+
+<div>
+
+<b>HOLOAI // INTERACTIVE LAB</b>
+
+<div class="muted">
+Game Theory · A* Search · AI Games
+</div>
+
+</div>
+
+<div class="live">
+● SYSTEM ONLINE
+</div>
+
+</div>
+
+
+<!-- ================= HOME ================= -->
+
+<section id="home" class="page active">
+
+<div class="hero">
+
+<div class="muted">
+ACTIVITY // GAME THEORY + A* ALGORITHM
+</div>
+
+<h1>
+WELCOME TO THE
+<span class="grad">
+HOLOGRAPHIC AI ARENA
+</span>
+</h1>
+
+<p>
+Learn search algorithms by interacting with them.
+Run Alpha-Beta pruning, navigate an A* map,
+and challenge a Minimax-powered Tic-Tac-Toe AI.
+</p>
+
+</div>
+
+
+<div class="grid">
+
+<div class="card">
+
+<div class="muted">
+GAME THEORY
+</div>
+
+<div class="stat">
+MINIMAX
+</div>
+
+<p class="muted">
+Watch MAX/MIN decisions propagate
+through the game tree.
+</p>
+
+<button
+class="btn primary"
+onclick="go('minimax')">
+Launch →
+</button>
+
+</div>
+
+
+<div class="card">
+
+<div class="muted">
+PATH FINDING
+</div>
+
+<div class="stat">
+A*
+</div>
+
+<p class="muted">
+Find a route from Lugoj to Bucharest
+using g(n)+h(n).
+</p>
+
+<button
+class="btn primary"
+onclick="go('astar')">
+Navigate →
+</button>
+
+</div>
+
+
+<div class="card">
+
+<div class="muted">
+NEW GAME
+</div>
+
+<div class="stat">
+TIC-TAC-TOE
+</div>
+
+<p class="muted">
+Play against an AI that uses Minimax.
+</p>
+
+<button
+class="btn primary"
+onclick="go('tictactoe')">
+Play →
+</button>
+
+</div>
+
+</div>
+
+
+<div class="head">
+
+<div>
+
+<h2>
+Hologram Core
+</h2>
+
+<p>
+Algorithm status visualization
+</p>
+
+</div>
+
+</div>
+
+
+<!-- HOLOGRAM -->
+
+<div class="holoStage">
+
+<div class="holo">
+
+<div class="ring"></div>
+
+<div class="ring2"></div>
+
+AI
+
+<br>
+
+<span
+style="
+font-size:12px;
+letter-spacing:4px;
+">
+CORE
+</span>
+
+</div>
+
+<div class="scan"></div>
+
+<div class="holoText">
+NEURAL SEARCH CORE // ONLINE
+</div>
+
+</div>
+
+</section>
+
+
+<!-- ================= MINIMAX ================= -->
+
+<section id="minimax" class="page">
+
+<div class="head">
+
+<div>
+
+<h2>
+♟ Minimax + Alpha-Beta Lab
+</h2>
+
+<p>
+A is MAX. B/C/D are MIN.
+Leaves use the activity values.
+</p>
+
+</div>
+
+<div class="controls">
+
+<button
+class="btn primary"
+onclick="runAB()">
+▶ Run
+</button>
+
+<button
+class="btn"
+onclick="resetAB()">
+↺ Reset
+</button>
+
+</div>
+
+</div>
+
+
+<div class="treebox">
+
+<div class="tree">
+
+<div class="row">
+
+<div id="A"
+class="node max">
+A
+</div>
+
+</div>
+
+
+<div class="row">
+
+<div id="B"
+class="node min">
+B
+</div>
+
+<div id="C"
+class="node min">
+C
+</div>
+
+<div id="D"
+class="node min">
+D
+</div>
+
+</div>
+
+
+<div class="row">
+
+
+<div class="children">
+
+
+<!-- B -->
+
+<div class="sub">
+
+<div id="E"
+class="node max">
+E
+</div>
+
+<div class="leaves">
+
+<div id="L"
+class="node leaf">
+L<br>2
+</div>
+
+<div id="M"
+class="node leaf">
+M<br>3
+</div>
+
+</div>
+
+</div>
+
+
+<div class="sub">
+
+<div id="F"
+class="node max">
+F
+</div>
+
+<div class="leaves">
+
+<div id="N"
+class="node leaf">
+N<br>3
+</div>
+
+<div id="O"
+class="node leaf">
+O<br>8
+</div>
+
+</div>
+
+</div>
+
+
+<div class="sub">
+
+<div id="G"
+class="node max">
+G
+</div>
+
+<div class="leaves">
+
+<div id="P"
+class="node leaf">
+P<br>7
+</div>
+
+<div id="Q"
+class="node leaf">
+Q<br>6
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+
+<!-- C -->
+
+<div class="children">
+
+<div class="sub">
+
+<div id="H"
+class="node max">
+H
+</div>
+
+<div class="leaves">
+
+<div id="R"
+class="node leaf">
+R<br>0
+</div>
+
+<div id="S"
+class="node leaf">
+S<br>1
+</div>
+
+</div>
+
+</div>
+
+
+<div class="sub">
+
+<div id="I"
+class="node max">
+I
+</div>
+
+<div class="leaves">
+
+<div id="T"
+class="node leaf">
+T<br>5
+</div>
+
+<div id="U"
+class="node leaf">
+U<br>2
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+
+<!-- D -->
+
+<div class="children">
+
+<div class="sub">
+
+<div id="J"
+class="node max">
+J
+</div>
+
+<div class="leaves">
+
+<div id="V"
+class="node leaf">
+V<br>8
+</div>
+
+<div id="W"
+class="node leaf">
+W<br>4
+</div>
+
+</div>
+
+</div>
+
+
+<div class="sub">
+
+<div id="K"
+class="node max">
+K
+</div>
+
+<div class="leaves">
+
+<div id="X"
+class="node leaf">
+X<br>10
+</div>
+
+<div id="Y"
+class="node leaf">
+Y<br>2
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+
+</div>
+
+</div>
+
+</div>
+
+
+<div class="grid">
+
+<div class="card">
+
+<div class="muted">
+MINIMAX RESULT
+</div>
+
+<div class="stat">
+A → D
+</div>
+
+<div class="muted">
+B=3, C=1, D=8,
+therefore A=8.
+</div>
+
+</div>
+
+
+<div class="card">
+
+<div class="muted">
+ALPHA-BETA
+</div>
+
+<div class="stat">
+O · Q · U · Y
+</div>
+
+<div class="muted">
+Leaves skipped during the
+illustrated traversal.
+</div>
+
+</div>
+
+
+<div class="card">
+
+<div class="muted">
+IDEA
+</div>
+
+<div class="stat">
+α ≥ β
+</div>
+
+<div class="muted">
+Remaining children can be skipped
+when they cannot change the result.
+</div>
+
+</div>
+
+</div>
+
+
+<div class="card"
+style="margin-top:15px">
+
+<div class="muted">
+SEARCH TRACE
+</div>
+
+<div id="ablog"
+class="log">
+Press Run to animate the decision process.
+</div>
+
+</div>
+
+</section>
+
+
+<!-- ================= A STAR ================= -->
+
+<section id="astar" class="page">
+
+<div class="head">
+
+<div>
+
+<h2>
+✦ A* Navigator
+</h2>
+
+<p>
+Lugoj → Bucharest using straight-line
+distance as h(n).
+</p>
+
+</div>
+
+<div class="controls">
+
+<button
+class="btn primary"
+onclick="astarStep()">
+Next Step →
+</button>
+
+<button
+class="btn"
+onclick="astarAll()">
+▶ Run All
+</button>
+
+<button
+class="btn"
+onclick="astarReset()">
+↺ Reset
+</button>
+
+</div>
+
+</div>
+
+
+<div class="two">
+
+<div class="map">
+
+<svg viewBox="0 0 900 550">
+
+<g>
+
+<line
+id="e-Lugoj-Mehadia"
+class="edge"
+x1="120"
+y1="360"
+x2="230"
+y2="405"/>
+
+<line
+id="e-Mehadia-Drobeta"
+class="edge"
+x1="230"
+y1="405"
+x2="145"
+y2="480"/>
+
+<line
+id="e-Drobeta-Craiova"
+class="edge"
+x1="145"
+y1="480"
+x2="350"
+y2="480"/>
+
+<line
+id="e-Lugoj-Timisoara"
+class="edge"
+x1="120"
+y1="360"
+x2="70"
+y2="270"/>
+
+<line
+id="e-Timisoara-Arad"
+class="edge"
+x1="70"
+y1="270"
+x2="205"
+y2="220"/>
+
+<line
+id="e-Arad-Zerind"
+class="edge"
+x1="205"
+y1="220"
+x2="170"
+y2="130"/>
+
+<line
+id="e-Zerind-Oradea"
+class="edge"
+x1="170"
+y1="130"
+x2="285"
+y2="90"/>
+
+<line
+id="e-Oradea-Sibiu"
+class="edge"
+x1="285"
+y1="90"
+x2="445"
+y2="190"/>
+
+<line
+id="e-Arad-Sibiu"
+class="edge"
+x1="205"
+y1="220"
+x2="445"
+y2="190"/>
+
+<line
+id="e-Sibiu-Fagaras"
+class="edge"
+x1="445"
+y1="190"
+x2="575"
+y2="210"/>
+
+<line
+id="e-Fagaras-Bucharest"
+class="edge"
+x1="575"
+y1="210"
+x2="770"
+y2="390"/>
+
+<line
+id="e-Sibiu-Rimnicu"
+class="edge"
+x1="445"
+y1="190"
+x2="505"
+y2="310"/>
+
+<line
+id="e-Rimnicu-Craiova"
+class="edge"
+x1="505"
+y1="310"
+x2="350"
+y2="480"/>
+
+<line
+id="e-Rimnicu-Pitesti"
+class="edge"
+x1="505"
+y1="310"
+x2="640"
+y2="330"/>
+
+<line
+id="e-Craiova-Pitesti"
+class="edge"
+x1="350"
+y1="480"
+x2="640"
+y2="330"/>
+
+<line
+id="e-Pitesti-Bucharest"
+class="edge"
+x1="640"
+y1="330"
+x2="770"
+y2="390"/>
+
+</g>
+
+<g id="cities"></g>
+
+</svg>
+
+</div>
+
+
+<div class="card">
+
+<div class="muted">
+CURRENT
+</div>
+
+<div
+id="acurrent"
+class="stat">
+Lugoj
+</div>
+
+<div class="formula">
+f(n) = g(n) + h(n)
+</div>
+
+<div class="muted">
+OPEN LIST
+</div>
+
+<div
+id="queue"
+class="queue">
+</div>
+
+<br>
+
+<div class="muted">
+ROUTE
+</div>
+
+<div
+id="aroute"
+style="margin-top:8px">
+Lugoj
+</div>
+
+<br>
+
+<div class="muted">
+HEURISTIC h(n)
+</div>
+
+<div
+id="hs"
+class="muted"
+style="line-height:1.7;margin-top:8px">
+</div>
+
+</div>
+
+</div>
+
+
+<div
+class="card"
+style="margin-top:15px">
+
+<div class="muted">
+A* TRACE
+</div>
+
+<div
+id="alog"
+class="log">
+Press Next Step to start the search.
+</div>
+
+</div>
+
+</section>
+
+
+<!-- ================= TIC TAC TOE ================= -->
+
+<section id="tictactoe" class="page">
+
+<div class="head">
+
+<div>
+
+<h2>
+◈ Neon Tic-Tac-Toe · Minimax AI
+</h2>
+
+<p>
+You are X. The holographic AI plays O using Minimax.
+</p>
+
+</div>
+
+<button
+class="btn primary"
+onclick="newGame()">
+↺ New Game
+</button>
+
+</div>
+
+
+<div class="gameLayout">
+
+<div class="card">
+
+<div class="muted">
+YOU = X · AI = O
+</div>
+
+<div
+id="board"
+class="board">
+</div>
+
+<div
+id="status"
+class="status">
+Your turn — choose a cell.
+</div>
+
+</div>
+
+
+<div>
+
+<div class="score">
+
+<div class="card">
+
+<div class="muted">
+YOU
+</div>
+
+<div
+id="sx"
+class="mini">
+0
+</div>
+
+</div>
+
+<div class="card">
+
+<div class="muted">
+AI
+</div>
+
+<div
+id="so"
+class="mini">
+0
+</div>
+
+</div>
+
+<div class="card">
+
+<div class="muted">
+DRAW
+</div>
+
+<div
+id="sd"
+class="mini">
+0
+</div>
+
+</div>
+
+</div>
+
+
+<div
+class="card"
+style="margin-top:15px">
+
+<h3>
+How the AI thinks
+</h3>
+
+<p class="muted">
+
+The AI explores possible moves,
+scores wins/losses/draws,
+and selects a move using Minimax.
+
+</p>
+
+<div class="formula">
+AI = Minimax(state)
+</div>
+
+<div
+id="gameLog"
+class="log">
+AI core ready...
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</section>
+
+
+<!-- ================= QUIZ ================= -->
+
+<section id="quiz" class="page">
+
+<div class="head">
+
+<div>
+
+<h2>
+? Mission Quiz
+</h2>
+
+<p>
+Test the concepts demonstrated in the prototype.
+</p>
+
+</div>
+
+<button
+class="btn"
+onclick="buildQuiz()">
+Reset
+</button>
+
+</div>
+
+<div
+id="quizbox"
+class="quiz">
+</div>
+
+</section>
+
+</main>
+
+</div>
+
+
+<script>
+
+/* ================= NAVIGATION ================= */
+
+const nav =
+document.querySelectorAll(".nav button");
+
+function go(id){
+
+    document
+        .querySelectorAll(".page")
+        .forEach(x =>
+            x.classList.remove("active")
+        );
+
+    document
+        .getElementById(id)
+        .classList.add("active");
+
+    nav.forEach(x =>
+        x.classList.toggle(
+            "active",
+            x.dataset.page === id
+        )
+    );
+}
+
+nav.forEach(x =>
+    x.onclick = () =>
+        go(x.dataset.page)
+);
+
+function wait(ms){
+    return new Promise(
+        resolve => setTimeout(resolve,ms)
+    );
+}
+
+
+/* =========================
+   MINIMAX
+========================= */
+
+const order = [
+    "A","B","E","L","M",
+    "F","N","O",
+    "G","P","Q",
+    "C","H","R","S",
+    "I","T","U",
+    "D","J","V","W",
+    "K","X","Y"
+];
+
+const pruned =
+[
+    "O",
+    "Q",
+    "U",
+    "Y"
+];
+
+function resetAB(){
+
+    document
+        .querySelectorAll(
+            "#minimax .node"
+        )
+        .forEach(x =>
+            x.classList.remove(
+                "sel",
+                "prune"
+            )
+        );
+
+    document.getElementById(
+        "ablog"
+    ).textContent =
+        "Press Run to animate the decision process.";
+}
+
+
+async function runAB(){
+
+    resetAB();
+
+    let log =
+        document.getElementById(
+            "ablog"
+        );
+
+    for(
+        const id of order
+    ){
+
+        let node =
+            document.getElementById(id);
+
+        node.classList.add("sel");
+
+        await wait(120);
+
+        node.classList.remove("sel");
+
+        if(
+            pruned.includes(id)
+        ){
+            node.classList.add("prune");
+        }
+    }
+
+    document
+        .getElementById("A")
+        .classList.add("sel");
+
+    document
+        .getElementById("D")
+        .classList.add("sel");
+
+    log.textContent =
+`A(MAX) starts
+
+B(MIN)
+E = max(2,3) = 3
+F = 3
+G = 7
+B = min(3,3,7) = 3
+
+C(MIN)
+H = 1
+I = 5
+C = 1
+
+D(MIN)
+J = 8
+K = 10
+D = 8
+
+A = max(3,1,8)
+A = 8
+
+FINAL MOVE → D
+
+Alpha-Beta skipped:
+O, Q, U, Y`;
+}
+
+
+/* =========================
+   A STAR
+========================= */
+
+const cities = {
+
+    Lugoj:
+        [120,360,244],
+
+    Mehadia:
+        [230,405,241],
+
+    Drobeta:
+        [145,480,242],
+
+    Craiova:
+        [350,480,160],
+
+    Timisoara:
+        [70,270,329],
+
+    Arad:
+        [205,220,366],
+
+    Zerind:
+        [170,130,374],
+
+    Oradea:
+        [285,90,380],
+
+    Sibiu:
+        [445,190,253],
+
+    Fagaras:
+        [575,210,176],
+
+    Rimnicu:
+        [505,310,193],
+
+    Pitesti:
+        [640,330,100],
+
+    Bucharest:
+        [770,390,0]
+};
+
+
+const graph = {
+
+    Lugoj:[
+        ["Mehadia",70],
+        ["Timisoara",111]
+    ],
+
+    Mehadia:[
+        ["Lugoj",70],
+        ["Drobeta",75]
+    ],
+
+    Drobeta:[
+        ["Mehadia",75],
+        ["Craiova",120]
+    ],
+
+    Craiova:[
+        ["Drobeta",120],
+        ["Rimnicu",146],
+        ["Pitesti",138]
+    ],
+
+    Timisoara:[
+        ["Lugoj",111],
+        ["Arad",118]
+    ],
+
+    Arad:[
+        ["Timisoara",118],
+        ["Zerind",75],
+        ["Sibiu",140]
+    ],
+
+    Zerind:[
+        ["Arad",75],
+        ["Oradea",71]
+    ],
+
+    Oradea:[
+        ["Zerind",71],
+        ["Sibiu",151]
+    ],
+
+    Sibiu:[
+        ["Oradea",151],
+        ["Arad",140],
+        ["Fagaras",99],
+        ["Rimnicu",80]
+    ],
+
+    Fagaras:[
+        ["Sibiu",99],
+        ["Bucharest",211]
+    ],
+
+    Rimnicu:[
+        ["Sibiu",80],
+        ["Craiova",146],
+        ["Pitesti",97]
+    ],
+
+    Pitesti:[
+        ["Rimnicu",97],
+        ["Craiova",138],
+        ["Bucharest",101]
+    ],
+
+    Bucharest:[]
+};
+
+
+let open=[];
+let closed=[];
+let parent={};
+let gScore={};
+
+
+function drawCities(){
+
+    let svg =
+        document.getElementById(
+            "cities"
+        );
+
+    Object.entries(cities)
+    .forEach(
+        ([name,c]) => {
+
+            let g =
+                document.createElementNS(
+                    "http://www.w3.org/2000/svg",
+                    "g"
+                );
+
+            let circle =
+                document.createElementNS(
+                    "http://www.w3.org/2000/svg",
+                    "circle"
+                );
+
+            circle.setAttribute(
+                "cx",c[0]
+            );
+
+            circle.setAttribute(
+                "cy",c[1]
+            );
+
+            circle.setAttribute(
+                "r",18
+            );
+
+            circle.setAttribute(
+                "class",
+                "city" +
+                (
+                    name === "Bucharest"
+                    ? " goal"
+                    : ""
+                )
+            );
+
+            circle.id =
+                "city" + name;
+
+
+            let text =
+                document.createElementNS(
+                    "http://www.w3.org/2000/svg",
+                    "text"
+                );
+
+            text.setAttribute(
+                "x",c[0]
+            );
+
+            text.setAttribute(
+                "y",c[1]
+            );
+
+            text.setAttribute(
+                "class",
+                "ct"
+            );
+
+            text.textContent =
+                name;
+
+
+            let h =
+                document.createElementNS(
+                    "http://www.w3.org/2000/svg",
+                    "text"
+                );
+
+            h.setAttribute(
+                "x",c[0]
+            );
+
+            h.setAttribute(
+                "y",c[1]+30
+            );
+
+            h.setAttribute(
+                "class",
+                "ch"
+            );
+
+            h.textContent =
+                "h=" + c[2];
+
+
+            g.append(
+                circle,
+                text,
+                h
+            );
+
+            svg.append(g);
+        }
+    );
+}
+
+
+function edgeId(a,b){
+
+    return (
+        document.getElementById(
+            "e-"+a+"-"+b
+        )
+        ||
+        document.getElementById(
+            "e-"+b+"-"+a
+        )
+    );
+}
+
+
+function score(n){
+
+    return (
+        (gScore[n] ?? 99999)
+        +
+        (cities[n]?.[2] ?? 99999)
+    );
+}
+
+
+function renderAStar(){
+
+    document.getElementById(
+        "acurrent"
+    ).textContent =
+        closed.length
+        ? closed.at(-1)
+        : "Lugoj";
+
+
+    document.getElementById(
+        "queue"
+    ).innerHTML =
+        open
+        .map(
+            n =>
+            `<span class="q">
+                ${n} · f=${score(n)}
+            </span>`
+        )
+        .join("")
+        ||
+        "<span class='muted'>empty</span>";
+
+
+    let route=[];
+
+    let x="Bucharest";
+
+    if(
+        gScore.Bucharest !== undefined
+    ){
+
+        while(x){
+
+            route.unshift(x);
+
+            x=parent[x];
+        }
+    }
+
+
+    document.getElementById(
+        "aroute"
+    ).textContent =
+        route.length
+        ? route.join(" → ")
+        : "Not reached";
+
+
+    document.getElementById(
+        "hs"
+    ).textContent =
+        Object.entries(cities)
+        .map(
+            ([n,c]) =>
+                n + ": " + c[2]
+        )
+        .join(" · ");
+}
+
+
+function astarReset(){
+
+    open=["Lugoj"];
+
+    closed=[];
+
+    parent={};
+
+    gScore={
+        Lugoj:0
+    };
+
+
+    document
+        .querySelectorAll(".edge")
+        .forEach(
+            e =>
+            e.classList.remove("on")
+        );
+
+
+    document
+        .querySelectorAll(".city")
+        .forEach(
+            e =>
+            e.classList.remove("on")
+        );
+
+
+    document.getElementById(
+        "alog"
+    ).textContent =
+        "Search initialized at Lugoj.";
+
+
+    renderAStar();
+}
+
+
+function astarStep(){
+
+    if(
+        !open.length
+        ||
+        closed.includes("Bucharest")
+    ){
+        return;
+    }
+
+
+    open.sort(
+        (a,b) =>
+            score(a)-score(b)
+    );
+
+
+    let current =
+        open.shift();
+
+
+    if(
+        closed.includes(current)
+    ){
+        return astarStep();
+    }
+
+
+    closed.push(current);
+
+
+    document
+        .getElementById(
+            "city"+current
+        )
+        ?.classList.add("on");
+
+
+    document.getElementById(
+        "acurrent"
+    ).textContent =
+        current;
+
+
+    document.getElementById(
+        "alog"
+    ).textContent +=
+`
+Expand ${current}
+g = ${gScore[current]}
+h = ${cities[current][2]}
+f = ${score(current)}
+`;
+
+
+    if(
+        current === "Bucharest"
+    ){
+
+        document.getElementById(
+            "alog"
+        ).textContent +=
+            "\n✓ GOAL REACHED!";
+
+        renderAStar();
+
+        return;
+    }
+
+
+    graph[current]
+    .forEach(
+        ([next,cost]) => {
+
+            let newCost =
+                gScore[current]
+                +
+                cost;
+
+
+            if(
+                newCost <
+                (gScore[next] ?? 99999)
+            ){
+
+                gScore[next] =
+                    newCost;
+
+                parent[next] =
+                    current;
+
+
+                if(
+                    !open.includes(next)
+                    &&
+                    !closed.includes(next)
+                ){
+
+                    open.push(next);
+                }
+
+
+                edgeId(
+                    current,
+                    next
+                )
+                ?.classList.add("on");
+            }
+        }
+    );
+
+
+    renderAStar();
+}
+
+
+async function astarAll(){
+
+    while(
+        !closed.includes(
+            "Bucharest"
+        )
+        &&
+        open.length
+    ){
+
+        astarStep();
+
+        await wait(400);
+    }
+}
+
+
+drawCities();
+
+astarReset();
+
+
+/* =========================
+   TIC TAC TOE MINIMAX
+========================= */
+
+let board =
+    Array(9).fill("");
+
+let scores =
+{
+    X:0,
+    O:0,
+    D:0
+};
+
+let gameOver=false;
+
+
+const wins=[
+
+    [0,1,2],
+    [3,4,5],
+    [6,7,8],
+
+    [0,3,6],
+    [1,4,7],
+    [2,5,8],
+
+    [0,4,8],
+    [2,4,6]
+
+];
+
+
+function winner(b){
+
+    for(
+        const w of wins
+    ){
+
+        if(
+            b[w[0]]
+            &&
+            b[w[0]] === b[w[1]]
+            &&
+            b[w[1]] === b[w[2]]
+        ){
+
+            return b[w[0]];
+        }
+    }
+
+
+    if(
+        b.every(Boolean)
+    ){
+        return "D";
+    }
+
+
+    return null;
+}
+
+
+/* MINIMAX */
+
+function minimax(b,isAI){
+
+    let result =
+        winner(b);
+
+
+    if(
+        result === "O"
+    ){
+        return 10;
+    }
+
+    if(
+        result === "X"
+    ){
+        return -10;
+    }
+
+    if(
+        result === "D"
+    ){
+        return 0;
+    }
+
+
+    let values=[];
+
+
+    for(
+        let i=0;
+        i<9;
+        i++
+    ){
+
+        if(!b[i]){
+
+            b[i]="O";
+
+            values.push(
+                minimax(b,false)
+            );
+
+            b[i]="";
+        }
+    }
+
+
+    return Math.max(...values);
+}
+
+
+function bestMove(){
+
+    let best=-Infinity;
+
+    let bestIndex=0;
+
+
+    for(
+        let i=0;
+        i<9;
+        i++
+    ){
+
+        if(!board[i]){
+
+            board[i]="O";
+
+            let value =
+                minimax(board);
+
+            board[i]="";
+
+
+            if(
+                value > best
+            ){
+
+                best=value;
+
+                bestIndex=i;
+            }
+        }
+    }
+
+
+    return bestIndex;
+}
+
+
+function renderGame(){
+
+    let container =
+        document.getElementById(
+            "board"
+        );
+
+    container.innerHTML="";
+
+
+    board.forEach(
+        (value,index) => {
+
+            let cell =
+                document.createElement(
+                    "button"
+                );
+
+            cell.className =
+                "cell " +
+                (
+                    value
+                    ? value.toLowerCase()
+                    : ""
+                );
+
+            cell.textContent =
+                value;
+
+
+            cell.onclick =
+                () =>
+                humanMove(index);
+
+
+            container.append(cell);
+        }
+    );
+
+
+    document.getElementById(
+        "sx"
+    ).textContent =
+        scores.X;
+
+    document.getElementById(
+        "so"
+    ).textContent =
+        scores.O;
+
+    document.getElementById(
+        "sd"
+    ).textContent =
+        scores.D;
+}
+
+
+function humanMove(index){
+
+    if(
+        board[index]
+        ||
+        gameOver
+    ){
+        return;
+    }
+
+
+    board[index]="X";
+
+    renderGame();
+
+
+    let result =
+        winner(board);
+
+
+    if(result){
+
+        finishGame(result);
+
+        return;
+    }
+
+
+    document.getElementById(
+        "status"
+    ).textContent =
+        "Hologram AI is calculating...";
+
+
+    setTimeout(
+        () => {
+
+            let move =
+                bestMove();
+
+
+            board[move]="O";
+
+
+            document.getElementById(
+                "gameLog"
+            ).textContent =
+`
+AI activated Minimax.
+
+Possible states evaluated.
+
+Selected cell:
+${move+1}
+
+Decision:
+MAX utility move selected.
+`;
+
+
+            renderGame();
+
+
+            let result =
+                winner(board);
+
+
+            if(result){
+
+                finishGame(result);
+
+            }else{
+
+                document.getElementById(
+                    "status"
+                ).textContent =
+                    "Your turn — choose a cell.";
+            }
+
+        },
+        300
+    );
+}
+
+
+function finishGame(result){
+
+    gameOver=true;
+
+    scores[result]++;
+
+    renderGame();
+
+
+    if(result==="X"){
+
+        document.getElementById(
+            "status"
+        ).textContent =
+            "🎉 You defeated the AI!";
+
+    }
+
+    else if(result==="O"){
+
+        document.getElementById(
+            "status"
+        ).textContent =
+            "🤖 AI wins using Minimax.";
+
+    }
+
+    else{
+
+        document.getElementById(
+            "status"
+        ).textContent =
+            "⚡ Draw — strategies balanced.";
+    }
+}
+
+
+function newGame(){
+
+    board =
+        Array(9).fill("");
+
+    gameOver=false;
+
+
+    document.getElementById(
+        "status"
+    ).textContent =
+        "Your turn — choose a cell.";
+
+
+    document.getElementById(
+        "gameLog"
+    ).textContent =
+        "AI core ready...";
+
+
+    renderGame();
+}
+
+
+newGame();
+
+
+/* =========================
+   QUIZ
+========================= */
+
+const questions=[
+
+[
+    "Which player does A represent?",
+    ["MAX","MIN","Chance","Heuristic"],
+    "MAX"
+],
+
+[
+    "Which leaves are skipped?",
+    ["L,M,N,P","O,Q,U,Y","R,S,T,V","All leaves"],
+    "O,Q,U,Y"
+],
+
+[
+    "What is the A* evaluation function?",
+    ["g(n)+h(n)","g(n)-h(n)","h(n)-g(n)","g(n)*h(n)"],
+    "g(n)+h(n)"
+],
+
+[
+    "What algorithm powers the Tic-Tac-Toe AI?",
+    ["DFS","BFS","Minimax","Dijkstra"],
+    "Minimax"
+]
+
+];
+
+
+function buildQuiz(){
+
+    let box =
+        document.getElementById(
+            "quizbox"
+        );
+
+    box.innerHTML="";
+
+
+    questions.forEach(
+        (q,index) => {
+
+            let card =
+                document.createElement(
+                    "div"
+                );
+
+            card.className="card";
+
+
+            card.innerHTML =
+                `<h3>
+                    ${index+1}. ${q[0]}
+                </h3>`;
+
+
+            q[1].forEach(
+                option => {
+
+                    let button =
+                        document.createElement(
+                            "button"
+                        );
+
+                    button.className=
+                        "option";
+
+                    button.textContent=
+                        option;
+
+
+                    button.onclick =
+                        () => {
+
+                            card
+                            .querySelectorAll(
+                                ".option"
+                            )
+                            .forEach(
+                                x =>
+                                x.classList
+                                .remove(
+                                    "correct",
+                                    "wrong"
+                                )
+                            );
+
+
+                            button.classList.add(
+                                option === q[2]
+                                ? "correct"
+                                : "wrong"
+                            );
+                        };
+
+
+                    card.append(button);
+                }
+            );
+
+
+            box.append(card);
+        }
+    );
+}
+
+
+buildQuiz();
+
+</script>
+
+</body>
+</html>
